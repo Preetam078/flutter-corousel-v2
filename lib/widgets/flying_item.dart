@@ -71,7 +71,8 @@ class _FlyingItemState extends State<FlyingItem> with SingleTickerProviderStateM
           child: Transform.scale(
             scale: _scaleAnimation.value,
             child: SizedBox(
-              width: MediaQuery.of(context).size.width * 0.7, // Approx height of card
+              width: MediaQuery.of(context).size.width * 0.7,
+              height: 360, // Approx height of card
               child: CarouselCard(item: widget.item),
             ),
           ),

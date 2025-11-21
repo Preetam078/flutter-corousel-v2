@@ -30,7 +30,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   void initState() {
     super.initState();
     _pageController = PageController(
-      viewportFraction: 0.7,
+      viewportFraction: 0.6,
     ); // Adjusted for taller aspect ratio
     _gapController =
         AnimationController(
@@ -55,7 +55,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     final size = MediaQuery.of(context).size;
     final cardWidth =
         size.width *
-        0.6; // This might need adjustment if viewportFraction changed
+        0.7; // Matches flying item width
     // Carousel height is 400. Card has vertical margin 20. So card height is 400 - 40 = 360.
     final cardHeight = 360.0;
     final startLeft = (size.width - cardWidth) / 2;
@@ -112,7 +112,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       _hiddenItemIds.remove(item.id);
 
       // Start gap closing animation
-      //_gapController.reverse(from: 0.0);
       _gapController.forward(from: 0.0);
     });
 

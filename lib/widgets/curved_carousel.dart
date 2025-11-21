@@ -97,7 +97,8 @@ class _CurvedCarouselState extends State<CurvedCarousel> {
           return AnimatedBuilder(
             animation: widget.gapAnimation!,
             builder: (context, child) {
-              double width = MediaQuery.of(context).size.width * 0.55; // 0.55 is fraction
+              // Use same gap width for both forward and backward animations
+              double width = MediaQuery.of(context).size.width * 0.55;
               
               // Apply easing curve for smoother animation
               final curvedValue = Curves.easeOutCubic.transform(widget.gapAnimation!.value);

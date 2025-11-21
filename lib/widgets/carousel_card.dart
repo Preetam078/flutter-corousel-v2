@@ -35,69 +35,77 @@ class CarouselCard extends StatelessWidget {
           children: [
             Container(
               width: double.infinity,
-              margin: EdgeInsets.all(10),
+              margin: const EdgeInsets.all(10),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(5),
                 color: Colors.white,
               ),
-              child: Column(
+              child: Stack(
                 children: [
+                  Column(
+                    children: [
+                      const SizedBox(height: 16), // Space for the badge
+                      Padding(
+                        padding: const EdgeInsets.only(top: 5),
+                        child: Image.asset(
+                          'lib/image/sample.png',
+                          width: 140,
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+                      Container(
+                        margin: const EdgeInsets.only(bottom: 10),
+                        child: Text(
+                          "View Details".toUpperCase(),
+                          style: const TextStyle(
+                            color: Color(0xFF3F6FD9),
+                            fontWeight: FontWeight.w700,
+                            fontSize: 10,
+                            decoration: TextDecoration.underline,
+                            decorationColor: Color(0xFF3F6FD9),
+                            height: 1.5,
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
                   Positioned(
                     top: 0,
-                    right: 0,
                     left: 0,
-                    child: Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 2,
-                      ),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.only(
-                          bottomLeft: Radius.circular(3),
-                          bottomRight: Radius.circular(3),
+                    right: 0,
+                    child: Align(
+                      alignment: Alignment.topCenter,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 2,
                         ),
-                        color: Color(0xFFFF4A75),
-                      ),
-                      child: Text(
-                        "ONLY 2 LEFT".toUpperCase(),
-                        style: TextStyle(
-                          fontSize: 10,
-                          color: Colors.white,
-                          fontWeight: FontWeight.w700,
+                        decoration: const BoxDecoration(
+                          borderRadius: BorderRadius.only(
+                            bottomLeft: Radius.circular(3),
+                            bottomRight: Radius.circular(3),
+                          ),
+                          color: Color(0xFFFF4A75),
+                        ),
+                        child: Text(
+                          "ONLY 2 LEFT".toUpperCase(),
+                          style: const TextStyle(
+                            fontSize: 10,
+                            color: Colors.white,
+                            fontWeight: FontWeight.w700,
+                          ),
                         ),
                       ),
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 5),
-                    child: Image.asset(
-                      'lib/image/sample.png',
-                      width: 140,
-                      fit: BoxFit.contain,
-                    ),
-                  ),
-                  Container(
-                    margin: EdgeInsets.only(bottom: 10),
-                    child: Text(
-                      "View Details".toUpperCase(),
-                      style: TextStyle(
-                        color: Color(0xFF3F6FD9),
-                        fontWeight: FontWeight.w700,
-                        fontSize: 10,
-                        decoration: TextDecoration.underline,
-                        decorationColor: Color(0xFF3F6FD9),
-                        height: 1.5,
-                      ),
-                    ),
-                  )
                 ],
               ),
             ),
             Container(
-              margin: EdgeInsets.only(top: 10),
+              margin: const EdgeInsets.only(top: 10),
               child: Text(
                       "Hubberholme".toUpperCase(),
-                      style: TextStyle(
+                      style: const TextStyle(
                         color: Colors.black,
                         fontWeight: FontWeight.w700,
                         fontSize: 10,
@@ -105,12 +113,12 @@ class CarouselCard extends StatelessWidget {
                     ),
             ),
             Container(
-              margin: EdgeInsets.only(top: 4),
+              margin: const EdgeInsets.only(top: 4),
               width: 150,
               child: Text(
                 "beige and linen formal look",
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: const TextStyle(
                   color: Colors.black,
                   fontWeight: FontWeight.w700,
                   fontSize: 16,
@@ -119,32 +127,32 @@ class CarouselCard extends StatelessWidget {
               ),
             ),
             Container(
-              margin: EdgeInsets.only(top: 15),
+              margin: const EdgeInsets.only(top: 15),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
                     "₹3,000",
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: Colors.black,
                       fontWeight: FontWeight.w700,
                       fontSize: 18,
                     ),
                   ),
-                  SizedBox(width: 8),
+                  const SizedBox(width: 8),
                   Text(
                     "₹5,499",
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: Colors.grey,
                       fontSize: 14,
                       decoration: TextDecoration.lineThrough,
                       decorationColor: Colors.grey,
                     ),
                   ),
-                  SizedBox(width: 8),
+                  const SizedBox(width: 8),
                   Text(
                     "20% off",
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: Color(0xFF4CAF50),
                       fontWeight: FontWeight.w600,
                       fontSize: 14,
