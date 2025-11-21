@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'draggable_carousel_card.dart';
 
 class CurvedCarousel extends StatefulWidget {
-  final List<CarouselItem> items;
+ final List<CarouselItem> items;
   final Function(CarouselItem, double) onPullDown;
   final PageController pageController;
   final Set<String> hiddenItems;

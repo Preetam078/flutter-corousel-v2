@@ -23,6 +23,7 @@ class _DraggableCarouselCardState extends State<DraggableCarouselCard>
   double _dragOffset = 0.0;
   late AnimationController _resetController;
   late Animation<double> _resetAnimation;
+  bool _isAutoAnimating = false;
 
   @override
   void initState() {
@@ -40,7 +41,13 @@ class _DraggableCarouselCardState extends State<DraggableCarouselCard>
   }
 
   void _handleDragUpdate(DragUpdateDetails details) {
-    if (!widget.isCurrent) return;
+    if (!widget.isCurrent || _isAutoAnimating) return;
+    
+    // Check if delta exceeds threshold for auto-drag
+    if (details.delta.dy > 100) {
+      _triggerAutoDrag();
+      return;
+    }
     
     // Only allow dragging down
     if (details.delta.dy > 0 || _dragOffset > 0) {
@@ -50,16 +57,36 @@ class _DraggableCarouselCardState extends State<DraggableCarouselCard>
     }
   }
 
-  void _handleDragEnd(DragEndDetails details) {
-    if (!widget.isCurrent) return;
+  void _triggerAutoDrag() {
+    final size = MediaQuery.of(context).size;
+    final targetOffset = size.height - 186;
+    
+    _isAutoAnimating = true;
+    
+    _resetAnimation = Tween<double>(begin: _dragOffset, end: targetOffset).animate(
+      CurvedAnimation(parent: _resetController, curve: Curves.easeOut),
+    );
+    
+    _resetController.forward(from: 0.0).then((_) {
+      widget.onPulledDown(targetOffset);
+      _isAutoAnimating = false;
+    });
+    
+    _resetController.addListener(() {
+      setState(() {
+        _dragOffset = _resetAnimation.value;
+      });
+    });
+  }
 
-    if (_dragOffset > 150) {
+  void _handleDragEnd(DragEndDetails details) {
+    if (!widget.isCurrent || _isAutoAnimating) return;
+    
+    final size = MediaQuery.of(context).size;
+
+    if (_dragOffset > size.height - 185) {
       // Trigger pull down action
       widget.onPulledDown(_dragOffset);
-      // We might want to keep it down or reset it depending on what happens next.
-      // For now, let's reset it visually but the parent should handle the removal.
-      // But if we reset immediately it looks glitchy. 
-      // The parent will likely remove this card from the tree.
     } else {
       // Snap back
       _resetAnimation = Tween<double>(begin: _dragOffset, end: 0.0).animate(
