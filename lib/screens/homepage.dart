@@ -50,6 +50,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   List<Widget> _flyingItems = [];
   final List<GlobalKey<FlyingItemState>> _flyingItemKeys = [];
+  final GlobalKey<DodCardFrontState> _cartKey = GlobalKey<DodCardFrontState>();
+  final GlobalKey<DodCardBackState> _cartBackKey = GlobalKey<DodCardBackState>();
   final Set<String> _hiddenItemIds = {};
 
   void _handlePullDown(CarouselItem item, double dragOffset) {
@@ -121,10 +123,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         endPosition: Offset(endLeft, endTop),
         targetRotation: rotation,
         onAnimationComplete: () {
-          // Trigger bounce on all flying items when this one completes
+          // Trigger bounce on all flying items and cart when this one completes
           for (final key in _flyingItemKeys) {
             key.currentState?.triggerBounce();
           }
+          _cartKey.currentState?.triggerBounce();
+          _cartBackKey.currentState?.triggerBounce();
         },
       );
       _flyingItems.add(flyingWidget);
@@ -188,17 +192,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         ),
         child: Stack(
           children: [
-            Positioned(
-              left: 0,
-              right: 0,
-              bottom: 0,
-              child: DodCardBack(
-                cartItems: [],
-                // onCartHandleMove: (value) {
-                //   // setState(() => _isCartHandleMove = value);
-                // },
-                isCartHandleMove: false,
-              ),
+            DodCardBack(
+              key: _cartBackKey,
+              cartItems: [],
+              // onCartHandleMove: (value) {
+              //   // setState(() => _isCartHandleMove = value);
+              // },
+              isCartHandleMove: false,
             ),
             SafeArea(
               child: Column(
@@ -225,16 +225,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               ),
             ),
             ..._flyingItems,
-             Positioned(
-              left: 0,
-              right: 0,
-              bottom: 0,
-              child: DodCardFront(
-                onCartHandleMove: (value) {
-                  // setState(() => _isCartHandleMove = value);
-                },
-                isCartHandleMove: false,
-              ),
+             DodCardFront(
+              key: _cartKey,
+              onCartHandleMove: (value) {
+                // setState(() => _isCartHandleMove = value);
+              },
+              isCartHandleMove: false,
             ),
             // Cart Overlay
             // Positioned(

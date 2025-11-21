@@ -16,14 +16,16 @@ class DodCardBack extends StatefulWidget {
   });
 
   @override
-  State<DodCardBack> createState() => _DodCardBackState();
+  State<DodCardBack> createState() => DodCardBackState();
 }
 
-class _DodCardBackState extends State<DodCardBack>
-    with SingleTickerProviderStateMixin {
+class DodCardBackState extends State<DodCardBack>
+    with TickerProviderStateMixin {
 
   late AnimationController _controller;
+  late AnimationController _bounceController;
   late Animation<double> _wobble;
+  late Animation<double> _bounceAnimation;
 
   @override
   void initState() {
@@ -34,10 +36,34 @@ class _DodCardBackState extends State<DodCardBack>
       duration: const Duration(milliseconds: 350),
     );
 
+    _bounceController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 400),
+    );
+
     // 10° wobble animation
     _wobble = Tween<double>(begin: -pi / 22, end: pi / 11).animate(
       CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
     );
+
+    // Bounce animation - moves up and down
+    _bounceAnimation = TweenSequence<double>([
+      TweenSequenceItem(
+        tween: Tween<double>(begin: 0.0, end: 10.0) // Move up 10 pixels
+            .chain(CurveTween(curve: Curves.easeOut)),
+        weight: 50,
+      ),
+      TweenSequenceItem(
+        tween: Tween<double>(begin: 10.0, end: 0.0) // Move back down
+            .chain(CurveTween(curve: Curves.elasticOut)),
+        weight: 50,
+      ),
+    ]).animate(_bounceController);
+  }
+
+  // Public method to trigger bounce animation
+  void triggerBounce() {
+    _bounceController.forward(from: 0.0);
   }
 
   Future<void> _playSmallWobble(int count) async {
@@ -86,80 +112,91 @@ class _DodCardBackState extends State<DodCardBack>
   @override
   void dispose() {
     _controller.dispose();
+    _bounceController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 210,
-      width: 300,
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          // Cart body
-          Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
-            child: SvgPicture.asset(
-              'lib/image/cart_back.svg',
-              width: 158,
-              height: 158,
-              fit: BoxFit.contain,
-            ),
-          ),
+    return AnimatedBuilder(
+      animation: _bounceController,
+      builder: (context, child) {
+        return Positioned(
+          bottom: 0 - _bounceAnimation.value, // Apply bounce offset
+          left: 0,
+          right: 0,
+          child: SizedBox(
+            height: 210,
+            width: 300,
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                // Cart body
+                Positioned(
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  child: SvgPicture.asset(
+                    'lib/image/cart_back.svg',
+                    width: 158,
+                    height: 158,
+                    fit: BoxFit.contain,
+                  ),
+                ),
 
-          // LEFT HANDLE — hinge at RIGHT side
-          Positioned(
-            top: 0,
-            left: 45,
-            height: 100,
-            width: 130,
-            child: AnimatedBuilder(
-              animation: _controller,
-              builder: (_, child) {
-                return Transform(
-                  alignment: Alignment.centerRight,
-                  transform: Matrix4.identity()
-                    ..rotateZ(widget.isCartHandleMove ? _wobble.value : 0),
-                  child: child,
-                );
-              },
-              child: SvgPicture.asset(
-                'lib/image/handle_back_lhs.svg',
-                fit: BoxFit.contain,
-              ),
-            ),
-          ),
+                // LEFT HANDLE — hinge at RIGHT side
+                Positioned(
+                  top: 0,
+                  left: 45,
+                  height: 100,
+                  width: 130,
+                  child: AnimatedBuilder(
+                    animation: _controller,
+                    builder: (_, child) {
+                      return Transform(
+                        alignment: Alignment.centerRight,
+                        transform: Matrix4.identity()
+                          ..rotateZ(widget.isCartHandleMove ? _wobble.value : 0),
+                        child: child,
+                      );
+                    },
+                    child: SvgPicture.asset(
+                      'lib/image/handle_back_lhs.svg',
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                ),
 
-          // RIGHT HANDLE — hinge at LEFT side
-          Positioned(
-            top: 0,
-            right: 45,
-            height: 100,
-            width: 130,
-            child: AnimatedBuilder(
-              animation: _controller,
-              builder: (_, child) {
-                return Transform(
-                  alignment: Alignment.centerLeft,
-                  transform: Matrix4.identity()
-                    ..rotateZ(widget.isCartHandleMove ? -_wobble.value : 0),
-                  child: child,
-                );
-              },
-              child: SvgPicture.asset(
-                'lib/image/handle_back_rhs.svg',
-                fit: BoxFit.contain,
-              ),
+                // RIGHT HANDLE — hinge at LEFT side
+                Positioned(
+                  top: 0,
+                  right: 45,
+                  height: 100,
+                  width: 130,
+                  child: AnimatedBuilder(
+                    animation: _controller,
+                    builder: (_, child) {
+                      return Transform(
+                        alignment: Alignment.centerLeft,
+                        transform: Matrix4.identity()
+                          ..rotateZ(widget.isCartHandleMove ? -_wobble.value : 0),
+                        child: child,
+                      );
+                    },
+                    child: SvgPicture.asset(
+                      'lib/image/handle_back_rhs.svg',
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                ),
+                // CartItems(
+                //   cartItems: widget.cartItems
+                // )
+              ],
             ),
           ),
-          // CartItems(
-          //   cartItems: widget.cartItems
-          // )
-        ],
-      ),
+        );
+      },
     );
   }
 }

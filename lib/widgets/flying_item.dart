@@ -72,12 +72,12 @@ class FlyingItemState extends State<FlyingItem> with TickerProviderStateMixin {
     // Bounce animation - moves up and down
     _bounceAnimation = TweenSequence<double>([
       TweenSequenceItem(
-        tween: Tween<double>(begin: 0.0, end: -10.0) // Move up 10 pixels
+        tween: Tween<double>(begin: 0.0, end: 20.0) // Move up 10 pixels
             .chain(CurveTween(curve: Curves.easeOut)),
         weight: 50,
       ),
       TweenSequenceItem(
-        tween: Tween<double>(begin: -10.0, end: 0.0) // Move back down
+        tween: Tween<double>(begin: 20.0, end: 0.0) // Move back down
             .chain(CurveTween(curve: Curves.elasticOut)),
         weight: 50,
       ),
