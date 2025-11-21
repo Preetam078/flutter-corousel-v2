@@ -67,7 +67,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     // Card height 360. 10% is 36.
     // Cart top is size.height - 100.
     // Card top should be size.height - 100 - 36 = size.height - 136.
-    final endTop = size.height - 136;
+    final endTop = size.height - 185 + 10 * _flyingItems.length;
     // If I want 5% peeking out, it means 95% is hidden.
     // If the cart covers the bottom 100px.
     // And the card is 360px high.
@@ -89,6 +89,21 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     final currentPage = _pageController.page?.round() ?? 0;
 
     setState(() {
+      // Calculate rotation based on position in stack
+      // 0th item: 0 degrees
+      // 1st item: 2 degrees
+      // 2nd item: -2 degrees
+      // Pattern continues...
+      double rotation;
+      final index = _flyingItems.length;
+      if (index == 0) {
+        rotation = 0.0;
+      } else if (index % 2 == 1) {
+        rotation = 2 * 3.14159 / 180; // 2 degrees in radians
+      } else {
+        rotation = -2 * 3.14159 / 180; // -2 degrees in radians
+      }
+
       // Start flying animation
       final flyingWidget = FlyingItem(
         key: UniqueKey(),
@@ -99,6 +114,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         // Cart top is size.height - 100.
         // Card top should be size.height - 100 - 18 = size.height - 118.
         endPosition: Offset(endLeft, endTop),
+        targetRotation: rotation,
         onAnimationComplete: () {
           // Keep it there
         },

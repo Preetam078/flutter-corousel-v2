@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'package:corousel_fe/widgets/item.dart';
 import 'package:flutter/material.dart';
 import 'carousel_card.dart';
@@ -7,6 +8,7 @@ class FlyingItem extends StatefulWidget {
   final Offset startPosition;
   final Offset endPosition;
   final VoidCallback onAnimationComplete;
+  final double targetRotation; // Rotation in radians
 
   const FlyingItem({
     super.key,
@@ -14,6 +16,7 @@ class FlyingItem extends StatefulWidget {
     required this.startPosition,
     required this.endPosition,
     required this.onAnimationComplete,
+    this.targetRotation = 0.0, // Default to no rotation
   });
 
   @override
@@ -24,6 +27,7 @@ class _FlyingItemState extends State<FlyingItem> with SingleTickerProviderStateM
   late AnimationController _controller;
   late Animation<Offset> _positionAnimation;
   late Animation<double> _scaleAnimation;
+  late Animation<double> _rotationAnimation;
 
   @override
   void initState() {
@@ -49,6 +53,15 @@ class _FlyingItemState extends State<FlyingItem> with SingleTickerProviderStateM
       curve: Curves.easeIn,
     ));
 
+    // 2D Rotation animation that activates when item reaches bottom
+    _rotationAnimation = Tween<double>(
+      begin: 0.0,
+      end: widget.targetRotation, // Use the rotation passed from parent
+    ).animate(CurvedAnimation(
+      parent: _controller,
+      curve: const Interval(0.6, 1.0, curve: Curves.easeInOut), // Starts at 60% of animation
+    ));
+
     _controller.forward().then((_) {
       widget.onAnimationComplete();
     });
@@ -68,12 +81,15 @@ class _FlyingItemState extends State<FlyingItem> with SingleTickerProviderStateM
         return Positioned(
           left: _positionAnimation.value.dx,
           top: _positionAnimation.value.dy,
-          child: Transform.scale(
-            scale: _scaleAnimation.value,
-            child: SizedBox(
-              width: MediaQuery.of(context).size.width * 0.7,
-              height: 360, // Approx height of card
-              child: CarouselCard(item: widget.item),
+          child: Transform.rotate(
+            angle: _rotationAnimation.value,
+            child: Transform.scale(
+              scale: _scaleAnimation.value,
+              child: SizedBox(
+                width: MediaQuery.of(context).size.width * 0.7,
+                height: 360, // Approx height of card
+                child: CarouselCard(item: widget.item),
+              ),
             ),
           ),
         );
