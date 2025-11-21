@@ -20,14 +20,16 @@ class FlyingItem extends StatefulWidget {
   });
 
   @override
-  State<FlyingItem> createState() => _FlyingItemState();
+  State<FlyingItem> createState() => FlyingItemState();
 }
 
-class _FlyingItemState extends State<FlyingItem> with SingleTickerProviderStateMixin {
+class FlyingItemState extends State<FlyingItem> with TickerProviderStateMixin {
   late AnimationController _controller;
+  late AnimationController _bounceController;
   late Animation<Offset> _positionAnimation;
   late Animation<double> _scaleAnimation;
   late Animation<double> _rotationAnimation;
+  late Animation<double> _bounceAnimation;
 
   @override
   void initState() {
@@ -35,6 +37,11 @@ class _FlyingItemState extends State<FlyingItem> with SingleTickerProviderStateM
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 800),
+    );
+
+    _bounceController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 400),
     );
 
     _positionAnimation = Tween<Offset>(
@@ -62,25 +69,45 @@ class _FlyingItemState extends State<FlyingItem> with SingleTickerProviderStateM
       curve: const Interval(0.6, 1.0, curve: Curves.easeInOut), // Starts at 60% of animation
     ));
 
+    // Bounce animation - moves up and down
+    _bounceAnimation = TweenSequence<double>([
+      TweenSequenceItem(
+        tween: Tween<double>(begin: 0.0, end: -10.0) // Move up 10 pixels
+            .chain(CurveTween(curve: Curves.easeOut)),
+        weight: 50,
+      ),
+      TweenSequenceItem(
+        tween: Tween<double>(begin: -10.0, end: 0.0) // Move back down
+            .chain(CurveTween(curve: Curves.elasticOut)),
+        weight: 50,
+      ),
+    ]).animate(_bounceController);
+
     _controller.forward().then((_) {
       widget.onAnimationComplete();
     });
   }
 
+  // Public method to trigger bounce animation
+  void triggerBounce() {
+    _bounceController.forward(from: 0.0);
+  }
+
   @override
   void dispose() {
     _controller.dispose();
+    _bounceController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation: _controller,
+      animation: Listenable.merge([_controller, _bounceController]),
       builder: (context, child) {
         return Positioned(
           left: _positionAnimation.value.dx,
-          top: _positionAnimation.value.dy,
+          top: _positionAnimation.value.dy + _bounceAnimation.value, // Add bounce offset
           child: Transform.rotate(
             angle: _rotationAnimation.value,
             child: Transform.scale(

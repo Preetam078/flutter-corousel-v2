@@ -49,6 +49,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   List<Widget> _flyingItems = [];
+  final List<GlobalKey<FlyingItemState>> _flyingItemKeys = [];
   final Set<String> _hiddenItemIds = {};
 
   void _handlePullDown(CarouselItem item, double dragOffset) {
@@ -104,9 +105,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         rotation = -2 * 3.14159 / 180; // -2 degrees in radians
       }
 
+      // Create a GlobalKey for this flying item
+      final flyingKey = GlobalKey<FlyingItemState>();
+      _flyingItemKeys.add(flyingKey);
+
       // Start flying animation
       final flyingWidget = FlyingItem(
-        key: UniqueKey(),
+        key: flyingKey,
         item: item,
         startPosition: Offset(startLeft, startTop),
         // Cart height 100. Card height 360. 5% of 360 is 18.
@@ -116,7 +121,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         endPosition: Offset(endLeft, endTop),
         targetRotation: rotation,
         onAnimationComplete: () {
-          // Keep it there
+          // Trigger bounce on all flying items when this one completes
+          for (final key in _flyingItemKeys) {
+            key.currentState?.triggerBounce();
+          }
         },
       );
       _flyingItems.add(flyingWidget);
