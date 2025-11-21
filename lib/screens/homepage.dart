@@ -115,7 +115,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       final flyingWidget = FlyingItem(
         key: flyingKey,
         item: item,
-        startPosition: Offset(startLeft, startTop),
+        startPosition: Offset(endLeft, endTop),
         // Cart height 100. Card height 360. 5% of 360 is 18.
         // We want top 18px visible above cart.
         // Cart top is size.height - 100.
@@ -200,6 +200,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               // },
               isCartHandleMove: false,
             ),
+            ..._flyingItems,
             SafeArea(
               child: Column(
                 children: [
@@ -224,7 +225,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 ],
               ),
             ),
-            ..._flyingItems,
+            
              DodCardFront(
               key: _cartKey,
               onCartHandleMove: (value) {

@@ -45,7 +45,7 @@ class FlyingItemState extends State<FlyingItem> with TickerProviderStateMixin {
     );
 
     _positionAnimation = Tween<Offset>(
-      begin: widget.startPosition,
+      begin: widget.endPosition,
       end: widget.endPosition,
     ).animate(CurvedAnimation(
       parent: _controller,
