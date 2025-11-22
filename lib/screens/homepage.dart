@@ -30,7 +30,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   void initState() {
     super.initState();
     _pageController = PageController(
-      viewportFraction: 0.6,
+      viewportFraction: 0.7,
     ); // Adjusted for taller aspect ratio
     _gapController =
         AnimationController(
@@ -143,25 +143,25 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       _gapController.forward(from: 0.0);
     });
 
-    // Smoothly animate to the correct page after removal
-    // If we removed the current item, stay at the same index (which now shows the next item)
-    // If we removed an item before current, we need to go back one
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    // Calculate target page immediately
+    int targetPage = currentPage;
+    if (_removedIndex < currentPage) {
+      targetPage = currentPage - 1;
+    }
+    targetPage = targetPage.clamp(0, _items.length - 1);
+
+    // Immediately jump to target page (updates _currentPage for verticalOffset)
+    // This happens instantly, gap animation handles the visual transition
+    if (_items.isNotEmpty && _pageController.hasClients) {
+      _pageController.jumpToPage(targetPage);
+    }
+
+    // After gap animation completes, do a smooth micro-adjustment if needed
+    Future.delayed(const Duration(milliseconds: 600), () {
       if (_items.isNotEmpty && _pageController.hasClients) {
-        int targetPage = currentPage;
-
-        // If we removed an item before the current page, adjust the target
-        if (_removedIndex < currentPage) {
-          targetPage = currentPage - 1;
-        }
-
-        // Ensure target page is within bounds
-        targetPage = targetPage.clamp(0, _items.length - 1);
-
-        // Animate to the target page smoothly
         _pageController.animateToPage(
           targetPage,
-          duration: const Duration(milliseconds: 500),
+          duration: const Duration(milliseconds: 100),
           curve: Curves.easeInOut,
         );
       }

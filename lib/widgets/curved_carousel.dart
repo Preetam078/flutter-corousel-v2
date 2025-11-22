@@ -62,6 +62,8 @@ class _CurvedCarouselState extends State<CurvedCarousel> {
         double relativePosition = index - _currentPage;
         // User requested "just 5% below", assuming card height ~400, 5% is 20.
         double verticalOffset = (relativePosition.abs() * 10).clamp(0.0, 50.0);
+
+        print("getting vertical offset......$verticalOffset");
         
         // Calculate tilt (rotation)
         // User requested "slightly tilted".
@@ -113,8 +115,9 @@ class _CurvedCarouselState extends State<CurvedCarousel> {
               
               if (removedLastItem && index < widget.removedIndex) {
                 // Removed the last item: items before it slide backward (left to right)
-                // Animation goes from 0.0 -> 1.0, offset goes from -width -> 0
-                offset = -width * (1.0 - curvedValue);
+                // Use viewportFraction-based width for proper alignment
+                double backwardWidth = MediaQuery.of(context).size.width * 0.7;
+                offset = -backwardWidth * (1.0 - curvedValue);
               } else if ((removedFirstItem || (!removedLastItem && index >= widget.removedIndex))) {
                 // Removed first item OR middle item: items after it slide forward (right to left)
                 // Animation goes from 0.0 -> 1.0, offset goes from +width -> 0
