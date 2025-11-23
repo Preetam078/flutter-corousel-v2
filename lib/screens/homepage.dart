@@ -22,6 +22,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     );
   });
 
+  bool _isCartHandleMove = false;
+
   late PageController _pageController;
   late AnimationController _gapController;
   int _removedIndex = -1;
@@ -132,6 +134,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         },
       );
       _flyingItems.add(flyingWidget);
+      setState(() {
+        _isCartHandleMove = true;
+      });
 
       // Remove item from carousel immediately
       int indexToRemove = _items.indexOf(item);
@@ -198,7 +203,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               // onCartHandleMove: (value) {
               //   // setState(() => _isCartHandleMove = value);
               // },
-              isCartHandleMove: false,
+              isCartHandleMove: _isCartHandleMove,
             ),
             ..._flyingItems,
             SafeArea(
@@ -229,9 +234,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
              DodCardFront(
               key: _cartKey,
               onCartHandleMove: (value) {
-                // setState(() => _isCartHandleMove = value);
+                setState(() => _isCartHandleMove = value);
               },
-              isCartHandleMove: false,
+              isCartHandleMove: _isCartHandleMove,
             ),
             // Cart Overlay
             // Positioned(

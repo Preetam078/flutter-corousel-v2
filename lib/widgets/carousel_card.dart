@@ -9,7 +9,7 @@ class CarouselCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+      padding: const EdgeInsets.symmetric(horizontal: 30.0),
       child: Container(
         margin: const EdgeInsets.symmetric(vertical: 20),
         decoration: BoxDecoration(
