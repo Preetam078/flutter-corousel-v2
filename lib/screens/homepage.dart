@@ -1,3 +1,6 @@
+import 'package:corousel_fe/widgets/corousel_cart_background.dart';
+import 'package:corousel_fe/widgets/corousel_cart_info.dart';
+import 'package:corousel_fe/widgets/corousel_timer.dart';
 import 'package:corousel_fe/widgets/curved_carousel.dart';
 import 'package:corousel_fe/widgets/dod_card_back.dart';
 import 'package:corousel_fe/widgets/dod_card_front.dart';
@@ -23,6 +26,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   });
 
   bool _isCartHandleMove = false;
+  bool _isTimerUrgent = false;
 
   late PageController _pageController;
   late AnimationController _gapController;
@@ -197,6 +201,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         ),
         child: Stack(
           children: [
+            if (_isTimerUrgent) const CarouselCartBackground(),
             DodCardBack(
               key: _cartBackKey,
               cartItems: [],
@@ -209,7 +214,18 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             SafeArea(
               child: Column(
                 children: [
-                  const SizedBox(height: 50),
+                  const SizedBox(height: 20),
+                  CarouselTimer(
+                    duration: const Duration(minutes: 2),
+                    borderColor: const Color(0xFF4A6B8A),
+                    textColor: Colors.white,
+                    onUrgentStateChanged: (isUrgent) {
+                      setState(() {
+                        _isTimerUrgent = isUrgent;
+                      });
+                    },
+                  ),
+                  const SizedBox(height: 20),
                   SizedBox(
                     height: 400, // Reverted height
                     child: CurvedCarousel(
@@ -238,6 +254,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               },
               isCartHandleMove: _isCartHandleMove,
             ),
+            CarouselCartInfo(
+
+            )
             // Cart Overlay
             // Positioned(
             //   bottom: 0,
