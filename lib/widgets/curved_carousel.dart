@@ -1,25 +1,33 @@
 import 'package:corousel_fe/widgets/item.dart';
+import 'package:corousel_fe/widgets/onboard_card.dart';
+import 'package:corousel_fe/widgets/draggable_onboard_card.dart';
 import 'package:flutter/material.dart';
 import 'draggable_carousel_card.dart';
 
 class CurvedCarousel extends StatefulWidget {
  final List<CarouselItem> items;
   final Function(CarouselItem, double) onPullDown;
+  final Function(int, double)? onOnboardPullDown; // New callback for onboard cards
   final PageController pageController;
   final Set<String> hiddenItems;
   final Animation<double>? gapAnimation;
   final int removedIndex;
   final int totalCountBeforeRemoval;
+  final List<OnboardCard>onBoardItems;
+  final isOnBoarded;
 
   const CurvedCarousel({
     super.key,
     required this.items,
     required this.onPullDown,
+    this.onOnboardPullDown,
     required this.pageController,
     this.hiddenItems = const {},
     this.gapAnimation,
     this.removedIndex = -1,
     this.totalCountBeforeRemoval = 0,
+    required this.onBoardItems,
+    required this.isOnBoarded
   });
 
   @override
@@ -47,11 +55,29 @@ class _CurvedCarouselState extends State<CurvedCarousel> {
 
   @override
   Widget build(BuildContext context) {
+    // Use onBoardItems if isOnBoarded is false (not yet onboarded), otherwise use items
+    final displayItems = !widget.isOnBoarded ? widget.onBoardItems : widget.items;
+    
     return PageView.builder(
       controller: widget.pageController,
-      itemCount: widget.items.length,
+      itemCount: displayItems.length,
       clipBehavior: Clip.none,
       itemBuilder: (context, index) {
+        // If showing onboard items, render them with drag functionality
+        if (!widget.isOnBoarded) {
+          final onboardCard = widget.onBoardItems[index];
+          return DraggableOnboardCard(
+            data: onboardCard.data,
+            isCurrent: true, // Always draggable for onboard cards
+            onPulledDown: (offset) {
+              if (widget.onOnboardPullDown != null) {
+                widget.onOnboardPullDown!(index, offset);
+              }
+            },
+          );
+        }
+        
+        // Otherwise, handle carousel items
         final item = widget.items[index];
         
         if (widget.hiddenItems.contains(item.id)) {

@@ -5,7 +5,10 @@ import 'package:corousel_fe/widgets/curved_carousel.dart';
 import 'package:corousel_fe/widgets/dod_card_back.dart';
 import 'package:corousel_fe/widgets/dod_card_front.dart';
 import 'package:corousel_fe/widgets/flying_item.dart';
+import 'package:corousel_fe/widgets/flying_onboard_item.dart';
 import 'package:corousel_fe/widgets/item.dart';
+import 'package:corousel_fe/widgets/onboard_card.dart';
+import 'package:corousel_fe/models/onboard_card.dart';
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -16,6 +19,16 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
+  final List<OnboardCard> onboardCards = [
+    const OnboardCard(
+      data: OnboardCardData(
+        imageUrl: 'lib/image/onboard_card.png',
+        title: 'home decor',
+        description: 'shop at exclusive discounts before the timer runs out',
+        participants: 12312,
+      ),
+    ),
+  ];
   final List<CarouselItem> _items = List.generate(5, (index) {
     return CarouselItem(
       id: '${index + 1}',
@@ -27,6 +40,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   bool _isCartHandleMove = false;
   bool _isTimerUrgent = false;
+  final bool _isOnBoarded = false;
 
   late PageController _pageController;
   late AnimationController _gapController;
@@ -56,6 +70,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   List<Widget> _flyingItems = [];
   final List<GlobalKey<FlyingItemState>> _flyingItemKeys = [];
+  final List<GlobalKey<FlyingOnboardItemState>> _flyingOnboardItemKeys = [];
   final GlobalKey<DodCardFrontState> _cartKey = GlobalKey<DodCardFrontState>();
   final GlobalKey<DodCardBackState> _cartBackKey = GlobalKey<DodCardBackState>();
   final Set<String> _hiddenItemIds = {};
@@ -183,6 +198,55 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     });
   }
 
+  void _handleOnboardPullDown(int index, double dragOffset) {
+    final size = MediaQuery.of(context).size;
+    final cardWidth = size.width * 0.7; // Matches flying item width
+    final cardHeight = 360.0;
+    final endLeft = (size.width - cardWidth) / 2;
+    final endTop = size.height - 185 + 10 * _flyingItems.length;
+
+    setState(() {
+      // Calculate rotation based on position in stack
+      double rotation;
+      final stackIndex = _flyingItems.length;
+      if (stackIndex == 0) {
+        rotation = 0.0;
+      } else if (stackIndex % 2 == 1) {
+        rotation = 2 * 3.14159 / 180; // 2 degrees in radians
+      } else {
+        rotation = -2 * 3.14159 / 180; // -2 degrees in radians
+      }
+
+      // Create a GlobalKey for this flying onboard item
+      final flyingKey = GlobalKey<FlyingOnboardItemState>();
+      _flyingOnboardItemKeys.add(flyingKey);
+
+      // Start flying animation
+      final flyingWidget = FlyingOnboardItem(
+        key: flyingKey,
+        data: onboardCards[index].data,
+        startPosition: Offset(endLeft, endTop),
+        endPosition: Offset(endLeft, endTop),
+        targetRotation: rotation,
+        onAnimationComplete: () {
+          // Trigger bounce on all flying items and cart when this one completes
+          for (final key in _flyingItemKeys) {
+            key.currentState?.triggerBounce();
+          }
+          for (final key in _flyingOnboardItemKeys) {
+            key.currentState?.triggerBounce();
+          }
+          _cartKey.currentState?.triggerBounce();
+          _cartBackKey.currentState?.triggerBounce();
+        },
+      );
+      _flyingItems.add(flyingWidget);
+      setState(() {
+        _isCartHandleMove = true;
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -230,9 +294,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     height: 400, // Reverted height
                     child: CurvedCarousel(
                       items: _items,
+                      onBoardItems: onboardCards,
+                      isOnBoarded: _isOnBoarded,
                       hiddenItems: _hiddenItemIds,
                       pageController: _pageController,
                       onPullDown: _handlePullDown,
+                      onOnboardPullDown: _handleOnboardPullDown,
                       gapAnimation: _gapController,
                       removedIndex: _removedIndex,
                       totalCountBeforeRemoval: _removedIndex != -1
