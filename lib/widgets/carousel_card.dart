@@ -45,12 +45,14 @@ class CarouselCard extends StatelessWidget {
                   Column(
                     children: [
                       const SizedBox(height: 16), // Space for the badge
-                      Padding(
-                        padding: const EdgeInsets.only(top: 5),
-                        child: Image.asset(
-                          'lib/image/sample.png',
-                          width: 140,
-                          fit: BoxFit.contain,
+                      Center(
+                        child: Padding(
+                          padding: const EdgeInsets.only(top: 5),
+                          child: Image.asset(
+                            'lib/image/sample.png',
+                            width: 140,
+                            fit: BoxFit.contain,
+                          ),
                         ),
                       ),
                       Container(

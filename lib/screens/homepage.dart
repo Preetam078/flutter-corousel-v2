@@ -255,8 +255,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               isCartHandleMove: _isCartHandleMove,
             ),
             CarouselCartInfo(
-
-            )
+              itemCount: _flyingItems.length,
+            ),
             // Cart Overlay
             // Positioned(
             //   bottom: 0,
